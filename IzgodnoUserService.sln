@@ -3,15 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IzgodnoUserService.API", "IzgodnoUserService\IzgodnoUserService.API.csproj", "{E5B571F7-D98C-4BAD-B85F-9313C868F504}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IzgodnoUserService.Data", "IzgodnoUserService.Data\IzgodnoUserService.Data.csproj", "{5B55EE79-DB3C-4164-B827-B8AC9C7EBC20}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IzgodnoUserService.Data", "IzgodnoUserService.Data\IzgodnoUserService.Data.csproj", "{5B55EE79-DB3C-4164-B827-B8AC9C7EBC20}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IzgodnoUserService.Data.Models", "IzgodnoUserService.Data.Models\IzgodnoUserService.Data.Models.csproj", "{31F61241-6413-42B1-8ACF-E612746343DF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IzgodnoUserService.Data.Models", "IzgodnoUserService.Data.Models\IzgodnoUserService.Data.Models.csproj", "{31F61241-6413-42B1-8ACF-E612746343DF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IzgodnoUserService.Services", "IzgodnoUserService.Services\IzgodnoUserService.Services.csproj", "{49687F5F-D106-482C-A30D-A5D00FF91D9F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IzgodnoUserService.Services", "IzgodnoUserService.Services\IzgodnoUserService.Services.csproj", "{49687F5F-D106-482C-A30D-A5D00FF91D9F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IzgodnoUserService.DTO", "IzgodnoUserService.DTO\IzgodnoUserService.DTO.csproj", "{DF14A5F4-3E35-4F76-BC70-53E126C2C37E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IzgodnoUserService.DTO", "IzgodnoUserService.DTO\IzgodnoUserService.DTO.csproj", "{DF14A5F4-3E35-4F76-BC70-53E126C2C37E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IzgodnoUserService.API", "IzgodnoUserService.API\IzgodnoUserService.API.csproj", "{893F6CBC-AA2A-48B0-8367-6E0AD1C1827C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,10 +19,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E5B571F7-D98C-4BAD-B85F-9313C868F504}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E5B571F7-D98C-4BAD-B85F-9313C868F504}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E5B571F7-D98C-4BAD-B85F-9313C868F504}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E5B571F7-D98C-4BAD-B85F-9313C868F504}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5B55EE79-DB3C-4164-B827-B8AC9C7EBC20}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5B55EE79-DB3C-4164-B827-B8AC9C7EBC20}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B55EE79-DB3C-4164-B827-B8AC9C7EBC20}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -39,6 +35,10 @@ Global
 		{DF14A5F4-3E35-4F76-BC70-53E126C2C37E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF14A5F4-3E35-4F76-BC70-53E126C2C37E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF14A5F4-3E35-4F76-BC70-53E126C2C37E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{893F6CBC-AA2A-48B0-8367-6E0AD1C1827C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{893F6CBC-AA2A-48B0-8367-6E0AD1C1827C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{893F6CBC-AA2A-48B0-8367-6E0AD1C1827C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{893F6CBC-AA2A-48B0-8367-6E0AD1C1827C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
