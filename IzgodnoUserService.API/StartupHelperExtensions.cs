@@ -1,5 +1,7 @@
 ﻿using IzgodnoUserService.Data;
 using IzgodnoUserService.Data.Models.UserEntities;
+using IzgodnoUserService.Data.Repositories.Interfaces;
+using IzgodnoUserService.Data.Repositories;
 using IzgodnoUserService.Services.UserServices;
 using IzgodnoUserService.Services.UserServices.Interfaces;
 using Microsoft.AspNetCore.Identity;
@@ -52,6 +54,8 @@ namespace IzgodnoUserService.API
                 });
 
             // --- Services ---
+            builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
 
             builder.Services.AddControllers();

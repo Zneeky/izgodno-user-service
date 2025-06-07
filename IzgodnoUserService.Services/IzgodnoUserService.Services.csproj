@@ -6,4 +6,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\IzgodnoUserService.Data.Models\IzgodnoUserService.Data.Models.csproj" />
+    <ProjectReference Include="..\IzgodnoUserService.Data\IzgodnoUserService.Data.csproj" />
+    <ProjectReference Include="..\IzgodnoUserService.DTO\IzgodnoUserService.DTO.csproj" />
+  </ItemGroup>
+
 </Project>
