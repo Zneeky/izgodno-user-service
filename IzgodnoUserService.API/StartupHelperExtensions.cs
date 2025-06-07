@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using IzgodnoUserService.Services.AuthenticationServices.Interfaces;
+using IzgodnoUserService.Services.AuthenticationServices;
 
 namespace IzgodnoUserService.API
 {
@@ -27,10 +30,10 @@ namespace IzgodnoUserService.API
             // --- JWT Authentication ---
             builder.Services.AddAuthentication(options =>
             {
-                options.DefaultAuthenticateScheme = "Bearer";
-                options.DefaultChallengeScheme = "Bearer";
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-            .AddJwtBearer("Bearer", options =>
+            .AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
@@ -41,7 +44,17 @@ namespace IzgodnoUserService.API
                     ValidIssuer = builder.Configuration["Jwt:Issuer"],
                     ValidAudience = builder.Configuration["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
+                        Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Secret"] ?? throw new InvalidOperationException("JWT Secret not configured")))
+                };
+
+                // Allow receiving tokens via cookies
+                options.Events = new JwtBearerEvents
+                {
+                    OnMessageReceived = context =>
+                    {
+                        context.Token = context.Request.Cookies["jwt"];
+                        return Task.CompletedTask;
+                    }
                 };
             });
 
@@ -57,6 +70,7 @@ namespace IzgodnoUserService.API
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();

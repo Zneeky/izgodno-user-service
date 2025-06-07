@@ -1,5 +1,7 @@
 ﻿using IzgodnoUserService.Data.Models.UserEntities;
 using IzgodnoUserService.Data.Repositories.Interfaces;
+using IzgodnoUserService.DTO;
+using IzgodnoUserService.DTO.Mappers;
 using IzgodnoUserService.Services.UserServices.Interfaces;
 
 namespace IzgodnoUserService.Services.UserServices
@@ -13,9 +15,12 @@ namespace IzgodnoUserService.Services.UserServices
             _userRepo = userRepo;
         }
 
-        public async Task<AppUser?> GetByEmailAsync(string email)
+        public async Task<UserDto?> GetByEmailAsync(string email)
         {
-            return await _userRepo.GetByEmailAsync(email);
+            var user = await _userRepo.GetByEmailAsync(email);
+            if (user is null) return null;
+
+            return UserMapper.ToDto(user);
         }
     }
 }

@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Google.Apis.Auth" Version="1.69.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.16" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\IzgodnoUserService.Data.Models\IzgodnoUserService.Data.Models.csproj" />
     <ProjectReference Include="..\IzgodnoUserService.Data\IzgodnoUserService.Data.csproj" />
     <ProjectReference Include="..\IzgodnoUserService.DTO\IzgodnoUserService.DTO.csproj" />
