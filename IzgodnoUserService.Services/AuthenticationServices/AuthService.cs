@@ -88,7 +88,9 @@ namespace IzgodnoUserService.Services.AuthenticationServices
                 user = new AppUser
                 {
                     Email = payload.Email,
-                    UserName = payload.Email
+                    UserName = payload.Email,
+                    CreatedAt = DateTime.UtcNow,
+                    DisplayName = payload.Name ?? payload.GivenName ?? payload.FamilyName ?? "Unknown User",
                 };
 
                 var result = await _userManager.CreateAsync(user);

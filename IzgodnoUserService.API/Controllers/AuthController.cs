@@ -1,6 +1,5 @@
 ﻿using IzgodnoUserService.DTO.Auth;
-using IzgodnoUserService.Services.AuthenticationServices;
-using Microsoft.AspNetCore.Http;
+using IzgodnoUserService.Services.AuthenticationServices.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IzgodnoUserService.API.Controllers
@@ -9,9 +8,9 @@ namespace IzgodnoUserService.API.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly AuthService _authService;
+        private readonly IAuthService _authService;
         
-        public AuthController (AuthService authService)
+        public AuthController (IAuthService authService)
         {
             _authService = authService;
         }
@@ -19,14 +18,27 @@ namespace IzgodnoUserService.API.Controllers
         [HttpPost("google-login")]
         public async Task<IActionResult> GoogleLogin([FromBody] GoogleLoginDto dto)
         {
-            var result = await _authService.AuthenticateWithGoogleAsync(dto.IdToken);
+            if (string.IsNullOrWhiteSpace(dto.IdToken))
+                return BadRequest("No token provided");
 
+            var result = await _authService.AuthenticateWithGoogleAsync(dto.IdToken);
             if (!result.Success)
                 return BadRequest(result.Errors);
 
-            // Set cookie (for extension compatibility)
             _authService.SetJwtCookie(Response, result.Token!);
+            return Ok(new { success = true });
+        }
 
+        [HttpGet("check-auth")]
+        public IActionResult CheckAuth()
+        {
+            return User.Identity?.IsAuthenticated == true ? Ok() : Unauthorized();
+        }
+
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+            Response.Cookies.Delete("jwt");
             return Ok(new { success = true });
         }
     }

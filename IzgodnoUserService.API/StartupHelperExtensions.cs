@@ -58,13 +58,15 @@ namespace IzgodnoUserService.API
                 };
             });
 
-            // --- Google OAuth ---
             builder.Services.AddAuthentication()
                 .AddGoogle("Google", options =>
                 {
-                    options.ClientId = builder.Configuration["GoogleAuthSettings:ClientId"]!;
-                    options.ClientSecret = builder.Configuration["GoogleAuthSettings:ClientSecret"]!;
+                    IConfigurationSection googleConf = builder.Configuration.GetSection("GoogleAuthSettings");
+                    options.ClientId = googleConf["ClientId"]!;
+                    options.ClientSecret = googleConf["ClientSecret"]!;
+                    options.SignInScheme = IdentityConstants.ExternalScheme;
                 });
+
 
             // --- Services ---
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
@@ -75,6 +77,20 @@ namespace IzgodnoUserService.API
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowChromeExtension", policy =>
+                {
+                    policy.WithOrigins(
+                            "chrome-extension://jhjicmlogjaiglekmddiajgjplaolofg", // Replace with your actual extension ID
+                            "http://127.0.0.1:5500/index.html"
+                        )
+                        .AllowAnyHeader()
+                        .AllowAnyMethod()
+                        .AllowCredentials(); // Important for cookies
+                });
+            });
 
             builder.Logging.ClearProviders();
             builder.Logging.AddConsole();
@@ -92,6 +108,7 @@ namespace IzgodnoUserService.API
 
             app.UseHttpsRedirection();
 
+            app.UseCors("AllowChromeExtension");
             app.UseAuthentication();
             app.UseAuthorization();
 
