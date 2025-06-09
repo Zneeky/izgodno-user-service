@@ -9,6 +9,7 @@ namespace IzgodnoUserService.Data.Models.UserEntities
         {
             CreatedAt = DateTime.UtcNow;
             UserTier = UserTier.Free;
+            RefreshTokens = new List<RefreshToken>();
         }
 
         public DateTime CreatedAt { get; set; }
@@ -16,5 +17,7 @@ namespace IzgodnoUserService.Data.Models.UserEntities
         public UserTier UserTier { get; set; }
 
         public string DisplayName { get; set; } = null!;
+
+        public ICollection<RefreshToken> RefreshTokens { get; set; } = null!;
     }
 }

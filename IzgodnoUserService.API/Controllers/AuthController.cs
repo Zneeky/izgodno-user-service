@@ -1,5 +1,6 @@
 ﻿using IzgodnoUserService.DTO.Auth;
 using IzgodnoUserService.Services.AuthenticationServices.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IzgodnoUserService.API.Controllers
@@ -26,7 +27,19 @@ namespace IzgodnoUserService.API.Controllers
                 return BadRequest(result.Errors);
 
             _authService.SetJwtCookie(Response, result.Token!);
+            _authService.SetRefreshTokenCookie(Response, result.RefreshToken!);
             return Ok(new { success = true });
+        }
+
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
+        {
+            var (success, newJwt, newRefresh) = await _authService.RefreshTokensAsync(refreshToken);
+            if (!success)
+                return Unauthorized();
+
+            _authService.SetJwtCookie(Response, newJwt!);
+            return Ok(new { token = newJwt, refreshToken = newRefresh!.Token });
         }
 
         [HttpGet("check-auth")]

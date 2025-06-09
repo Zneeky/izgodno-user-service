@@ -1,7 +1,9 @@
-﻿using IzgodnoUserService.Data.Models.UserEntities;
+﻿using IzgodnoUserService.Data.Models;
+using IzgodnoUserService.Data.Models.UserEntities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 
 namespace IzgodnoUserService.Data
@@ -12,7 +14,7 @@ namespace IzgodnoUserService.Data
            : base(options)
         {
         }
-
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -24,6 +26,19 @@ namespace IzgodnoUserService.Data
             builder.Entity<IdentityUserLogin<Guid>>().ToTable("UserLogins");
             builder.Entity<IdentityRoleClaim<Guid>>().ToTable("RoleClaims");
             builder.Entity<IdentityUserToken<Guid>>().ToTable("UserTokens");
+
+            builder.Entity<RefreshToken>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.HasIndex(e => e.Token).IsUnique();
+                entity.Property(e => e.Token).IsRequired();
+                entity.Property(e => e.UserId).IsRequired();
+
+                entity.HasOne(e => e.User)
+                 .WithMany(u => u.RefreshTokens)
+                 .HasForeignKey(e => e.UserId)
+                 .OnDelete(DeleteBehavior.Cascade);
+            });
         }
     }
 }

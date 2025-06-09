@@ -1,5 +1,7 @@
 ﻿using Google.Apis.Auth;
+using IzgodnoUserService.Data.Models;
 using IzgodnoUserService.Data.Models.UserEntities;
+using IzgodnoUserService.Data.Repositories.Interfaces;
 using IzgodnoUserService.DTO.Auth;
 using IzgodnoUserService.Services.AuthenticationServices.Interfaces;
 using Microsoft.AspNetCore.Http;
@@ -11,6 +13,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,11 +23,13 @@ namespace IzgodnoUserService.Services.AuthenticationServices
     {
 
         private readonly IConfiguration _config;
+        private readonly IRefreshTokenRepository _refreshTokenRepository;
         private readonly UserManager<AppUser> _userManager;
 
-        public AuthService(IConfiguration config, UserManager<AppUser> userManager)
+        public AuthService(IConfiguration config, IRefreshTokenRepository refreshTokenRepository, UserManager<AppUser> userManager)
         {
             _config = config;
+            _refreshTokenRepository = refreshTokenRepository;
             _userManager = userManager;
         }
         public string GenerateJwtToken(AppUser user)
@@ -43,7 +48,7 @@ namespace IzgodnoUserService.Services.AuthenticationServices
                 issuer: _config["Jwt:Issuer"],
                 audience: _config["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddDays(7),
+                expires: DateTime.UtcNow.AddMinutes(int.Parse(_config["Jwt:AccessTokenExpireMinutes"]!)),
                 signingCredentials: creds
             );
 
@@ -57,8 +62,29 @@ namespace IzgodnoUserService.Services.AuthenticationServices
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.None,
-                Expires = DateTime.UtcNow.AddDays(7)
+                Expires = DateTime.UtcNow.AddMinutes(int.Parse(_config["Jwt:AccessTokenExpireMinutes"]!)),
             });
+        }
+
+        public void SetRefreshTokenCookie(HttpResponse response, string token)
+        {
+            response.Cookies.Append("refreshToken", token, new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Expires = DateTime.UtcNow.AddDays(int.Parse(_config["Jwt:RefreshTokenExpireDays"]!)),
+            });
+        }
+
+        public RefreshToken GenerateRefreshToken(Guid userId)
+        {
+            return new RefreshToken
+            {
+                Token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(64)),
+                Expires = DateTime.UtcNow.AddDays(int.Parse(_config["Jwt:RefreshTokenExpireDays"]!)),
+                UserId = userId
+            };
         }
 
         public async Task<AuthResultDto> AuthenticateWithGoogleAsync(string idToken)
@@ -90,7 +116,7 @@ namespace IzgodnoUserService.Services.AuthenticationServices
                     Email = payload.Email,
                     UserName = payload.Email,
                     CreatedAt = DateTime.UtcNow,
-                    DisplayName = payload.Name ?? payload.GivenName ?? payload.FamilyName ?? "Unknown User",
+                    DisplayName = payload.Name ?? payload.GivenName ?? payload.FamilyName ?? payload.Email,
                 };
 
                 var result = await _userManager.CreateAsync(user);
@@ -104,14 +130,48 @@ namespace IzgodnoUserService.Services.AuthenticationServices
                 }
             }
 
-            // Generate JWT
             var jwt = GenerateJwtToken(user);
+            var newRefresh = GenerateRefreshToken(user.Id);
+
+            await _refreshTokenRepository.AddAsync(newRefresh);
+            await _refreshTokenRepository.SaveChangesAsync();
 
             return new AuthResultDto
             {
                 Success = true,
-                Token = jwt
+                Token = jwt,
+                RefreshToken = newRefresh.Token
             };
+        }
+
+        public async Task<(bool Success, string? JwtToken, RefreshToken? RefreshToken)> RefreshTokensAsync(string refreshToken)
+        {
+            var storedToken = await _refreshTokenRepository.GetByTokenAsync(refreshToken);
+
+            if (storedToken == null ||
+                storedToken.IsUsed ||
+                storedToken.IsRevoked ||
+                storedToken.Expires < DateTime.UtcNow)
+            {
+                return (false, null, null);
+            }
+
+            storedToken.IsUsed = true;
+            await _refreshTokenRepository.SaveChangesAsync();
+
+            var user = await _userManager.FindByIdAsync(storedToken.UserId.ToString());
+            if (user == null)
+            {
+                return (false, null, null);
+            }
+
+            var newJwt = GenerateJwtToken(user);
+            var newRefresh = GenerateRefreshToken(user.Id);
+
+            await _refreshTokenRepository.AddAsync(newRefresh);
+            await _refreshTokenRepository.SaveChangesAsync();
+
+            return (true, newJwt, newRefresh);
         }
     }
 }
