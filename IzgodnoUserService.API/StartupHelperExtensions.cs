@@ -14,6 +14,8 @@ using IzgodnoUserService.Services.AuthenticationServices;
 using IzgodnoUserService.Services.MessageQueueService.Interfaces;
 using IzgodnoUserService.Services.MessageQueueService;
 using StackExchange.Redis;
+using MassTransit;
+using IzgodnoUserService.API.Consumers;
 
 namespace IzgodnoUserService.API
 {
@@ -69,6 +71,25 @@ namespace IzgodnoUserService.API
                     options.ClientSecret = googleConf["ClientSecret"]!;
                     options.SignInScheme = IdentityConstants.ExternalScheme;
                 });
+
+            builder.Services.AddMassTransit(x =>
+            {
+                x.AddConsumer<ProductResultConsumer>();
+
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Host("localhost", "/", h =>
+                    {
+                        h.Username("guest");
+                        h.Password("guest");
+                    });
+
+                    cfg.ReceiveEndpoint("product.result", e =>
+                    {
+                        e.ConfigureConsumer<ProductResultConsumer>(context);
+                    });
+                });
+            });
 
 
             // --- Services ---

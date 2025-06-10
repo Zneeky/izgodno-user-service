@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace IzgodnoUserService.API.Controllers
 {
-    [Authorize]
+   // [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ProductController : ControllerBase
@@ -28,14 +28,14 @@ namespace IzgodnoUserService.API.Controllers
         [HttpPost("lookup")]
         public async Task<IActionResult> LookupProduct([FromBody] ProductLookupRequest requestFromClient)
         {
-            var userId = User.FindFirst("sub")?.Value;
+            //var userId = User.FindFirst("sub")?.Value;
 
-            if (string.IsNullOrWhiteSpace(userId))
-                return Unauthorized();
+            //if (string.IsNullOrWhiteSpace(userId))
+            //    return Unauthorized();
 
             var request = new ProductLookupRequest(
                 Guid.NewGuid(),
-                userId,
+                "uasdadsada",//userId,
                 requestFromClient.ProductName,
                 requestFromClient.Source,
                 DateTime.UtcNow
