@@ -11,6 +11,9 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using IzgodnoUserService.Services.AuthenticationServices.Interfaces;
 using IzgodnoUserService.Services.AuthenticationServices;
+using IzgodnoUserService.Services.MessageQueueService.Interfaces;
+using IzgodnoUserService.Services.MessageQueueService;
+using StackExchange.Redis;
 
 namespace IzgodnoUserService.API
 {
@@ -69,11 +72,18 @@ namespace IzgodnoUserService.API
 
 
             // --- Services ---
+            builder.Services.AddSignalR();
+            builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+                ConnectionMultiplexer.Connect("localhost:6379"));
+
+            builder.Services.AddScoped<RedisConnectionManager>();
+
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<IUserRepository, UserRepository>();
             builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IRabbitMqPublisher, RabbitMqPublisher>();
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
