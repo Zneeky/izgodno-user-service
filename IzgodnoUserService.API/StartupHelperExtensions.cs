@@ -16,6 +16,7 @@ using IzgodnoUserService.Services.MessageQueueService;
 using StackExchange.Redis;
 using MassTransit;
 using IzgodnoUserService.API.Consumers;
+using IzgodnoUserService.API.Hubs;
 
 namespace IzgodnoUserService.API
 {
@@ -145,6 +146,8 @@ namespace IzgodnoUserService.API
             app.UseAuthorization();
 
             app.MapControllers();
+            app.MapHub<NotificationHub>("/hubs/notification")
+                .RequireCors("AllowChromeExtension"); ;
 
             return app;
         }
