@@ -17,24 +17,18 @@ namespace IzgodnoUserService.API.Hubs
 
         public override async Task OnConnectedAsync()
         {
-            var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!string.IsNullOrEmpty(userId))
-            {
-                await _redis.StoreConnectionIdAsync(userId, Context.ConnectionId);
-            }
-
             await base.OnConnectedAsync();
         }
 
-        public override async Task OnDisconnectedAsync(Exception? ex)
+        public override async Task OnDisconnectedAsync(Exception? exception)
         {
-            var userId = Context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (!string.IsNullOrEmpty(userId))
-            {
-                await _redis.RemoveConnectionIdAsync(userId);
-            }
+            await base.OnDisconnectedAsync(exception);
+        }
 
-            await base.OnDisconnectedAsync(ex);
+        // Frontend will call this to get its connectionId
+        public Task<string> GetConnectionId()
+        {
+            return Task.FromResult(Context.ConnectionId);
         }
     }
 }

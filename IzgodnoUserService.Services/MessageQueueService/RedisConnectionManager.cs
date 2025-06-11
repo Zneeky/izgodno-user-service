@@ -11,19 +11,19 @@ namespace IzgodnoUserService.Services.MessageQueueService
             _db = redis.GetDatabase();
         }
 
-        public async Task StoreConnectionIdAsync(string userId, string connectionId)
+        public async Task SetRequestConnectionMappingAsync(string requestId, string connectionId)
         {
-            await _db.StringSetAsync($"conn:{userId}", connectionId, TimeSpan.FromHours(1));
+            await _db.StringSetAsync($"request:{requestId}", connectionId, TimeSpan.FromMinutes(5));
         }
 
-        public async Task<string?> GetConnectionIdAsync(string userId)
+        public async Task<string?> GetConnectionIdByRequestIdAsync(string requestId)
         {
-            return await _db.StringGetAsync($"conn:{userId}");
+            return await _db.StringGetAsync($"request:{requestId}");
         }
 
-        public async Task RemoveConnectionIdAsync(string userId)
+        public async Task RemoveRequestConnectionMappingAsync(string requestId)
         {
-            await _db.KeyDeleteAsync($"conn:{userId}");
+            await _db.KeyDeleteAsync($"request:{requestId}");
         }
     }
 }

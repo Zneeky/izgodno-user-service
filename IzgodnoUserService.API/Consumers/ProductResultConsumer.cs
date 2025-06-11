@@ -21,15 +21,17 @@ namespace IzgodnoUserService.API.Consumers
         {
             var result = context.Message;
 
-            var connectionId = await _redis.GetConnectionIdAsync(result.UserId);
+            var connectionId = await _redis.GetConnectionIdByRequestIdAsync(result.RequestId.ToString());
             if (connectionId != null)
             {
                 await _hubContext.Clients.Client(connectionId)
                     .SendAsync("ReceiveProductResult", result);
+
+                await _redis.RemoveRequestConnectionMappingAsync(result.RequestId.ToString());
             }
             else
             {
-                Console.WriteLine($"User not connected: {result.UserId}");
+                Console.WriteLine($"No connection ID found for request: {result.RequestId}");
             }
         }
     }

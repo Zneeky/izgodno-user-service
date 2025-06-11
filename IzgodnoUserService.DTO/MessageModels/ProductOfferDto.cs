@@ -8,8 +8,8 @@ namespace IzgodnoUserService.DTO.MessageModels
 {
     public class ProductOfferDto
     {
-        public string Website { get; set; } = default!;
+        public string Store { get; set; } = default!;
         public decimal Price { get; set; }
-        public string ProductPageUrl { get; set; } = default!;
+        public string Url { get; set; } = default!;
     }
 }

@@ -26,7 +26,7 @@ namespace IzgodnoUserService.API.Controllers
         }
 
         [HttpPost("lookup")]
-        public async Task<IActionResult> LookupProduct([FromBody] ProductLookupRequest requestFromClient)
+        public async Task<IActionResult> LookupProduct([FromBody] ProductLookupRequestClient requestFromClient)
         {
             //var userId = User.FindFirst("sub")?.Value;
 
@@ -35,28 +35,33 @@ namespace IzgodnoUserService.API.Controllers
 
             var request = new ProductLookupRequest(
                 Guid.NewGuid(),
-                "uasdadsada",//userId,
+                "dasdada",
                 requestFromClient.ProductName,
                 requestFromClient.Source,
                 DateTime.UtcNow
             );
+
+            var connectionId = requestFromClient.ConnectionId; // Or pass it from client via headers or query param
+
+            // NEW: Store requestId → connectionId
+            await _redis.SetRequestConnectionMappingAsync(request.RequestId.ToString(), connectionId);
 
             await _publisher.PublishProductLookup(request);
 
             return Ok(new { status = "published", requestId = request.RequestId });
         }
 
-        [HttpPost("result")]
-        public async Task<IActionResult> ReceiveResult([FromBody] ProductResultDto result)
-        {
-            var connectionId = await _redis.GetConnectionIdAsync(result.UserId);
-            if (connectionId != null)
-            {
-                await _hubContext.Clients.Client(connectionId)
-                    .SendAsync("ReceiveProductResult", result);
-            }
+        //[HttpPost("result")]
+        //public async Task<IActionResult> ReceiveResult([FromBody] ProductResultDto result)
+        //{
+        //    var connectionId = await _redis.GetConnectionIdAsync(result.UserId);
+        //    if (connectionId != null)
+        //    {
+        //        await _hubContext.Clients.Client(connectionId)
+        //            .SendAsync("ReceiveProductResult", result);
+        //    }
 
-            return Ok();
-        }
+        //    return Ok();
+        //}
     }
 }
