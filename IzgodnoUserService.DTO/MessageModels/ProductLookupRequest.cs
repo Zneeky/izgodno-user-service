@@ -15,11 +15,8 @@ namespace IzgodnoUserService.DTO.MessageModels
     );
 
     public record ProductLookupRequestClient (
-        Guid? RequestId,
-        string? UserId,
         string ProductName,
         string Source,
-        DateTime Timestamp,
         string ConnectionId
     );
 }

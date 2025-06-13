@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using System.Security.Claims;
 
 namespace IzgodnoUserService.API.Controllers
 {
@@ -28,14 +29,14 @@ namespace IzgodnoUserService.API.Controllers
         [HttpPost("lookup")]
         public async Task<IActionResult> LookupProduct([FromBody] ProductLookupRequestClient requestFromClient)
         {
-            //var userId = User.FindFirst("sub")?.Value;
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            //if (string.IsNullOrWhiteSpace(userId))
-            //    return Unauthorized();
+            if (string.IsNullOrWhiteSpace(userId))
+                return Unauthorized();
 
             var request = new ProductLookupRequest(
                 Guid.NewGuid(),
-                "dasdada",
+                userId,
                 requestFromClient.ProductName,
                 requestFromClient.Source,
                 DateTime.UtcNow
@@ -50,18 +51,5 @@ namespace IzgodnoUserService.API.Controllers
 
             return Ok(new { status = "published", requestId = request.RequestId });
         }
-
-        //[HttpPost("result")]
-        //public async Task<IActionResult> ReceiveResult([FromBody] ProductResultDto result)
-        //{
-        //    var connectionId = await _redis.GetConnectionIdAsync(result.UserId);
-        //    if (connectionId != null)
-        //    {
-        //        await _hubContext.Clients.Client(connectionId)
-        //            .SendAsync("ReceiveProductResult", result);
-        //    }
-
-        //    return Ok();
-        //}
     }
 }
