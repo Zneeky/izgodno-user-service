@@ -32,14 +32,20 @@ namespace IzgodnoUserService.API.Controllers
         }
 
         [HttpPost("refresh-token")]
-        public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
+        public async Task<IActionResult> RefreshToken()
         {
+            var refreshToken = Request.Cookies["refreshToken"];
+            if (string.IsNullOrEmpty(refreshToken))
+                return Unauthorized();
+
             var (success, newJwt, newRefresh) = await _authService.RefreshTokensAsync(refreshToken);
             if (!success)
                 return Unauthorized();
 
             _authService.SetJwtCookie(Response, newJwt!);
-            return Ok(new { token = newJwt, refreshToken = newRefresh!.Token });
+            _authService.SetRefreshTokenCookie(Response, newRefresh!.Token);
+
+            return Ok(new { token = newJwt });
         }
 
         [HttpGet("check-auth")]

@@ -117,7 +117,8 @@ namespace IzgodnoUserService.API
                 {
                     policy.WithOrigins(
                             "chrome-extension://jhjicmlogjaiglekmddiajgjplaolofg", // Replace with your actual extension ID
-                            "http://127.0.0.1:5500/index.html"
+                            "http://127.0.0.1:5500/index.html",
+                            "http://localhost:4200"
                         )
                         .AllowAnyHeader()
                         .AllowAnyMethod()
