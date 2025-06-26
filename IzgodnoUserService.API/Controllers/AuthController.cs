@@ -43,7 +43,6 @@ namespace IzgodnoUserService.API.Controllers
                 return Unauthorized();
 
             _authService.SetJwtCookie(Response, newJwt!);
-            _authService.SetRefreshTokenCookie(Response, newRefresh!.Token);
 
             return Ok(new { token = newJwt });
         }
