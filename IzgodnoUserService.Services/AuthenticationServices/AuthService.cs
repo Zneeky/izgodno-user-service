@@ -149,7 +149,7 @@ namespace IzgodnoUserService.Services.AuthenticationServices
             var storedToken = await _refreshTokenRepository.GetByTokenAsync(refreshToken);
 
             if (storedToken == null ||
-                storedToken.IsUsed ||
+                //storedToken.IsUsed ||
                 storedToken.IsRevoked ||
                 storedToken.Expires < DateTime.UtcNow)
             {
