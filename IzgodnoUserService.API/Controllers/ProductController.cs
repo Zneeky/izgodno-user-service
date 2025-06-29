@@ -10,7 +10,7 @@ using System.Security.Claims;
 
 namespace IzgodnoUserService.API.Controllers
 {
-   // [Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ProductController : ControllerBase
